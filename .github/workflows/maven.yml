@@ -1,19 +1,16 @@
-name: Java CI with Maven
+name: Build and Deploy to Maven Central
 
 on:
   push:
-    branches: [ "master" ]
-  pull_request:
-    branches: [ "master" ]
-  workflow_dispatch:  # позволяет запускать вручную
+    tags:
+      - 'v*.*.*'  # срабатывает на теги вида v1.0.0
 
 jobs:
-  build:
+  build-and-deploy:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
       - name: Set up JDK 17
         uses: actions/setup-java@v4
@@ -22,18 +19,8 @@ jobs:
           distribution: 'temurin'
           cache: maven
 
-      - name: Build with Maven
-        run: mvn -B package --file pom.xml
-
-      - name: Upload JAR artifact (for workflow download)
-        uses: actions/upload-artifact@v4
-        with:
-          name: my-app-jar
-          path: target/*.jar
-
-      - name: Create GitHub Release and attach JAR
-        uses: ncipollo/release-action@v1
-        with:
-          tag: v1.0.0
-          name: Release v1.0.0
-          files: target/*.jar
+      - name: Build and deploy to Maven
+        run: mvn clean deploy -B -s settings.xml -DskipTests
+        env:
+          OSSRH_USERNAME: ${{ secrets.OSSRH_USERNAME }}
+          OSSRH_PASSWORD: ${{ secrets.OSSRH_PASSWORD }}
