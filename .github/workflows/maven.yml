@@ -1,5 +1,10 @@
 name: Build and Deploy to Maven Central
 
+on:
+  push:
+    branches:
+      - master
+
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
@@ -15,7 +20,6 @@ jobs:
           cache: maven
 
       - name: Build and deploy to Maven
-        run: mvn clean deploy -B -s settings.xml -DskipTests
-        env:
-          OSSRH_USERNAME: ${{ secrets.OSSRH_USERNAME }}
-          OSSRH_PASSWORD: ${{ secrets.OSSRH_PASSWORD }}
+        run: mvn clean deploy -B -DskipTests \
+          -DossrhUsername=${{ secrets.OSSRH_USERNAME }} \
+          -DossrhPassword=${{ secrets.OSSRH_PASSWORD }}
