@@ -1,10 +1,5 @@
 name: Build and Deploy to Maven Central
 
-on:
-  push:
-    tags:
-      - 'v*.*.*'  # срабатывает на теги вида v1.0.0
-
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
