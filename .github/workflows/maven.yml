@@ -5,6 +5,7 @@ on:
     branches: [ "master" ]
   pull_request:
     branches: [ "master" ]
+  workflow_dispatch:  # позволяет запускать вручную
 
 jobs:
   build:
@@ -24,8 +25,15 @@ jobs:
       - name: Build with Maven
         run: mvn -B package --file pom.xml
 
-      - name: Upload JAR artifact
+      - name: Upload JAR artifact (for workflow download)
         uses: actions/upload-artifact@v4
         with:
           name: my-app-jar
           path: target/*.jar
+
+      - name: Create GitHub Release and attach JAR
+        uses: ncipollo/release-action@v1
+        with:
+          tag: v1.0.0
+          name: Release v1.0.0
+          files: target/*.jar
