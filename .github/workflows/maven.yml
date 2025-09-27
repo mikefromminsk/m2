@@ -1,4 +1,4 @@
-name: Build and Deploy to Maven Central
+name: Build and Deploy to GitHub Packages
 
 on:
   push:
@@ -18,18 +18,19 @@ jobs:
           distribution: 'temurin'
           cache: maven
 
-      - name: Create temporary settings.xml with OSSRH credentials
+      # --- Настройка Maven для GitHub Packages ---
+      - name: Create temporary settings.xml with GitHub token
         run: |
           mkdir -p ~/.m2
           echo "<settings>
             <servers>
               <server>
-                <id>ossrh</id>
-                <username>${{ secrets.OSSRH_USERNAME }}</username>
-                <password>${{ secrets.OSSRH_PASSWORD }}</password>
+                <id>github</id>
+                <username>${{ github.actor }}</username>
+                <password>${{ secrets.M2_GITHUB_TOKEN }}</password>
               </server>
             </servers>
           </settings>" > ~/.m2/settings.xml
 
-      - name: Build and deploy to Maven Central
+      - name: Build and deploy to GitHub Packages
         run: mvn clean deploy -B -s ~/.m2/settings.xml -DskipTests
